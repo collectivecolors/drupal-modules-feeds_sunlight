@@ -24,7 +24,7 @@ define('FEEDS_SUNLIGHT_DEFAULT_ENTITY', FEEDS_SUNLIGHT_LEGISLATOR);
  * Implements hook_menu().
  */
 function feeds_sunlight_menu() {
-	
+
 	$items['admin/config/services/sunlight'] = array(
     'title'            => 'Sunlight',
     'description'      => 'Configure integration with Sunlight Labs API services.',
@@ -44,9 +44,9 @@ function feeds_sunlight_menu() {
  * Implements hook_ctools_plugin_api().
  */
 function feeds_sunlight_ctools_plugin_api($owner, $api) {
-  if ($owner == 'feeds' && $api == 'plugins') {
-    return array('version' => 1);
-  }
+	if ($owner == 'feeds' && $api == 'plugins') {
+		return array('version' => 1);
+	}
 }
 
 /**
@@ -54,9 +54,9 @@ function feeds_sunlight_ctools_plugin_api($owner, $api) {
  */
 function feeds_sunlight_feeds_plugins() {
 	$info = array();
-	
+
 	$path = drupal_get_path('module', 'feeds_sunlight') . '/plugins';
-		
+
 	$info['FeedsSunlightFetcher'] = array(
     'name' => 'Sunlight Congressional Information Fetcher',
     'description' => 'Pull information from the SunlightLabs API.',
@@ -65,9 +65,9 @@ function feeds_sunlight_feeds_plugins() {
       'class' => 'FeedsSunlightFetcher',
       'file' => 'FeedsSunlightFetcher.inc',
       'path' => $path,
-		),
+	),
 	);
-	
+
 	$info['FeedsSunlightLegislatorParser'] = array(
 	  'name' => 'Sunlight Legislator Parser',
 	  'description' => 'Parse Legislator information.',
@@ -76,9 +76,9 @@ function feeds_sunlight_feeds_plugins() {
 	    'class' => 'FeedsSunlightLegislatorParser',
 	    'file' => 'FeedsSunlightLegislatorParser.inc',
 	    'path' => $path,
-		),
+	),
 	);
-	
+
 	return $info;
 }
 
@@ -90,15 +90,15 @@ function feeds_sunlight_feeds_plugins() {
  */
 function feeds_sunlight_get_connector($type = FEEDS_SUNLIGHT_DEFAULT_ENTITY) {
 	static $loaded = FALSE;
-	
+
 	if (!$loaded) {
 		$path = libraries_get_path('sunlight-php/class.sunlightlabs.php');
 		require_once($path);
 		$loaded = TRUE;
 	}
-	
+
 	$connector          = new $type();
 	$connector->api_key = variable_get('feeds_sunlight_api_key', NULL);
-	
+
 	return $connector;
 }
