@@ -25,16 +25,16 @@ define('FEEDS_SUNLIGHT_DEFAULT_ENTITY', FEEDS_SUNLIGHT_LEGISLATOR);
  */
 function feeds_sunlight_menu() {
 
-	$items['admin/config/services/sunlight'] = array(
-    'title'            => 'Sunlight',
+  $items['admin/config/services/sunlight'] = array(
+  	'title'            => 'Sunlight',
     'description'      => 'Configure integration with Sunlight Labs API services.',
     'page callback'    => 'drupal_get_form',
     'page arguments'   => array('feeds_sunlight_admin_form'),
     'access arguments' => array('administer site configuration'),
     'file'             => 'feeds_sunlight.admin.inc',
-	);
+  );
 
-	return $items;
+  return $items;
 }
 
 //------------------------------------------------------------------------------
@@ -44,20 +44,20 @@ function feeds_sunlight_menu() {
  * Implements hook_ctools_plugin_api().
  */
 function feeds_sunlight_ctools_plugin_api($owner, $api) {
-	if ($owner == 'feeds' && $api == 'plugins') {
-		return array('version' => 1);
-	}
+  if ($owner == 'feeds' && $api == 'plugins') {
+    return array('version' => 1);
+  }
 }
 
 /**
  * Implements hook_feeds_plugins().
  */
 function feeds_sunlight_feeds_plugins() {
-	$info = array();
+  $info = array();
 
-	$path = drupal_get_path('module', 'feeds_sunlight') . '/plugins';
+  $path = drupal_get_path('module', 'feeds_sunlight') . '/plugins';
 
-	$info['FeedsSunlightFetcher'] = array(
+  $info['FeedsSunlightFetcher'] = array(
     'name' => 'Sunlight Congressional Information Fetcher',
     'description' => 'Pull information from the SunlightLabs API.',
     'handler' => array(
@@ -65,10 +65,10 @@ function feeds_sunlight_feeds_plugins() {
       'class' => 'FeedsSunlightFetcher',
       'file' => 'FeedsSunlightFetcher.inc',
       'path' => $path,
-	),
-	);
+  ),
+  );
 
-	$info['FeedsSunlightLegislatorParser'] = array(
+  $info['FeedsSunlightLegislatorParser'] = array(
 	  'name' => 'Sunlight Legislator Parser',
 	  'description' => 'Parse Legislator information.',
 	  'handler' => array(
@@ -76,10 +76,10 @@ function feeds_sunlight_feeds_plugins() {
 	    'class' => 'FeedsSunlightLegislatorParser',
 	    'file' => 'FeedsSunlightLegislatorParser.inc',
 	    'path' => $path,
-	),
-	);
+  ),
+  );
 
-	return $info;
+  return $info;
 }
 
 //------------------------------------------------------------------------------
@@ -89,16 +89,16 @@ function feeds_sunlight_feeds_plugins() {
  * Load the sunlight API connector classes
  */
 function feeds_sunlight_get_connector($type = FEEDS_SUNLIGHT_DEFAULT_ENTITY) {
-	static $loaded = FALSE;
+  static $loaded = FALSE;
 
-	if (!$loaded) {
-		$path = libraries_get_path('sunlight-php/class.sunlightlabs.php');
-		require_once($path);
-		$loaded = TRUE;
-	}
+  if (!$loaded) {
+    $path = libraries_get_path('sunlight-php/class.sunlightlabs.php');
+    require_once($path);
+    $loaded = TRUE;
+  }
 
-	$connector          = new $type();
-	$connector->api_key = variable_get('feeds_sunlight_api_key', NULL);
+  $connector          = new $type();
+  $connector->api_key = variable_get('feeds_sunlight_api_key', NULL);
 
-	return $connector;
+  return $connector;
 }
