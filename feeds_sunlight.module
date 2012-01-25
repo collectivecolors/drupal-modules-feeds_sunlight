@@ -1,0 +1,104 @@
+<?php
+
+/**
+ * @file
+ * Sunlight API Feeds integration - basic API functions and hook implementations.
+ */
+
+//------------------------------------------------------------------------------
+// Sunlight constants
+
+/**
+ * Sunlight API entity classes
+ */
+define('FEEDS_SUNLIGHT_LEGISLATOR', 'SunlightLegislator');
+define('FEEDS_SUNLIGHT_COMMITTEE', 'SunlightCommittee');
+define('FEEDS_SUNLIGHT_LOBBYIST', 'SunlightLobbyist');
+
+define('FEEDS_SUNLIGHT_DEFAULT_ENTITY', FEEDS_SUNLIGHT_LEGISLATOR);
+
+//------------------------------------------------------------------------------
+// Drupal core hooks
+
+/**
+ * Implements hook_menu().
+ */
+function feeds_sunlight_menu() {
+	
+	$items['admin/config/services/sunlight'] = array(
+    'title'            => 'Sunlight',
+    'description'      => 'Configure integration with Sunlight Labs API services.',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('feeds_sunlight_admin_form'),
+    'access arguments' => array('administer site configuration'),
+    'file'             => 'feeds_sunlight.admin.inc',
+	);
+
+	return $items;
+}
+
+//------------------------------------------------------------------------------
+// Feeds hooks
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function feeds_sunlight_ctools_plugin_api($owner, $api) {
+  if ($owner == 'feeds' && $api == 'plugins') {
+    return array('version' => 1);
+  }
+}
+
+/**
+ * Implements hook_feeds_plugins().
+ */
+function feeds_sunlight_feeds_plugins() {
+	$info = array();
+	
+	$path = drupal_get_path('module', 'feeds_sunlight') . '/plugins';
+		
+	$info['FeedsSunlightFetcher'] = array(
+    'name' => 'Sunlight Congressional Information Fetcher',
+    'description' => 'Pull information from the SunlightLabs API.',
+    'handler' => array(
+      'parent' => 'FeedsFetcher', // This is the key name, not the class name.
+      'class' => 'FeedsSunlightFetcher',
+      'file' => 'FeedsSunlightFetcher.inc',
+      'path' => $path,
+		),
+	);
+	
+	$info['FeedsSunlightLegislatorParser'] = array(
+	  'name' => 'Sunlight Legislator Parser',
+	  'description' => 'Parse Legislator information.',
+	  'handler' => array(
+	    'parent' => 'FeedsParser',
+	    'class' => 'FeedsSunlightLegislatorParser',
+	    'file' => 'FeedsSunlightLegislatorParser.inc',
+	    'path' => $path,
+		),
+	);
+	
+	return $info;
+}
+
+//------------------------------------------------------------------------------
+// Auxillary functions
+
+/**
+ * Load the sunlight API connector classes
+ */
+function feeds_sunlight_get_connector($type = FEEDS_SUNLIGHT_DEFAULT_ENTITY) {
+	static $loaded = FALSE;
+	
+	if (!$loaded) {
+		$path = libraries_get_path('sunlight-php/class.sunlightlabs.php');
+		require_once($path);
+		$loaded = TRUE;
+	}
+	
+	$connector          = new $type();
+	$connector->api_key = variable_get('feeds_sunlight_api_key', NULL);
+	
+	return $connector;
+}
